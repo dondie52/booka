@@ -7,7 +7,7 @@ const DataContext = createContext()
 
 // Bump this version whenever default catalog data changes.
 // Forces a refresh from defaults on next load, replacing stale localStorage data.
-const CATALOG_VERSION = 2
+const CATALOG_VERSION = 3
 
 export function DataProvider({ children }) {
   const catalogIsCurrent = storageService.get('bookheaven_catalog_version') === CATALOG_VERSION

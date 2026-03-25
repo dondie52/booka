@@ -28,7 +28,7 @@ INSERT INTO books (title, author, description, price, stock_quantity, category_i
   (
     'The Alchemist', 'Paulo Coelho',
     'A shepherd boy journeys from Spain to the Egyptian pyramids, discovering that the treasure he seeks is closer than he imagined.',
-    180.00, 3,
+    160.00, 3,
     (SELECT id FROM categories WHERE slug = 'inspirational'),
     '#D4A017', '978-0062315007', 1988, true, 'active', ''
   ),
@@ -42,7 +42,7 @@ INSERT INTO books (title, author, description, price, stock_quantity, category_i
   (
     'Ikigai', 'Hector Garcia & Francesc Miralles',
     'The Japanese secret to a long and purposeful life, drawn from the wisdom of Okinawa''s centenarians.',
-    180.00, 2,
+    170.00, 2,
     (SELECT id FROM categories WHERE slug = 'lifestyle'),
     '#E8B960', '978-0143130727', 2017, true, 'active', ''
   ),
@@ -56,7 +56,7 @@ INSERT INTO books (title, author, description, price, stock_quantity, category_i
   (
     'The Art of Seduction', 'Robert Greene',
     'A study of influence and persuasion through the lens of historical figures and timeless archetypes.',
-    180.00, 1,
+    170.00, 1,
     (SELECT id FROM categories WHERE slug = 'psychology'),
     '#880E4F', '978-0142001196', 2001, false, 'active', ''
   ),
@@ -123,6 +123,93 @@ INSERT INTO books (title, author, description, price, stock_quantity, category_i
     (SELECT id FROM categories WHERE slug = 'career'),
     '#00695C', '978-1591848202', 2016, false, 'needs_verification',
     'Most likely Jenny Blake''s career book — confirm this is the correct edition and author.'
+  );
+
+-- New arrivals
+INSERT INTO books (title, author, description, price, stock_quantity, category_id, cover_color, isbn, published_year, is_featured, status, verification_notes) VALUES
+  (
+    'The Pivot Year', 'Brianna Wiest',
+    'A collection of daily reflections to help you navigate the year that changes everything — letting go, growing up, and moving forward.',
+    180.00, 3,
+    (SELECT id FROM categories WHERE slug = 'self-help'),
+    '#A67B5B', '978-1988171968', 2023, false, 'active', ''
+  ),
+  (
+    'The Wealth Money Can''t Buy', 'Robin Sharma',
+    'Eight hidden habits to live your richest life — exploring the forms of wealth that matter most beyond financial success.',
+    180.00, 3,
+    (SELECT id FROM categories WHERE slug = 'self-help'),
+    '#2E7D32', '978-1443461771', 2024, false, 'active', ''
+  ),
+  (
+    'The Happy Sexy Millionaire', 'Steven Bartlett',
+    'A brutally honest challenge to the conventional wisdom about success, happiness, and the pursuit of fulfilment.',
+    180.00, 3,
+    (SELECT id FROM categories WHERE slug = 'self-help'),
+    '#F57C00', '978-1529345414', 2021, false, 'active', ''
+  ),
+  (
+    'Think and Grow Rich', 'Napoleon Hill',
+    'The timeless classic on turning desire into wealth through thirteen principles distilled from decades of studying the most successful people.',
+    180.00, 3,
+    (SELECT id FROM categories WHERE slug = 'business-finance'),
+    '#4E342E', '978-1585424337', 1937, false, 'active', ''
+  ),
+  (
+    'The 48 Laws of Power', 'Robert Greene',
+    'A distillation of 3,000 years of the history of power into 48 essential laws — amoral, cunning, and instructive.',
+    170.00, 3,
+    (SELECT id FROM categories WHERE slug = 'strategy'),
+    '#212121', '978-0140280197', 1998, false, 'active', ''
+  ),
+  (
+    'The 33 Strategies of War', 'Robert Greene',
+    'A guide to the subtle social game of everyday life, drawing on the military strategies of history''s greatest commanders.',
+    170.00, 2,
+    (SELECT id FROM categories WHERE slug = 'strategy'),
+    '#8D6E63', '978-0143112785', 2006, false, 'active', ''
+  ),
+  (
+    'It Ends with Us', 'Colleen Hoover',
+    'A brave and heartbreaking novel about love, strength, and the choices that define us — based in part on the author''s own experience.',
+    170.00, 3,
+    (SELECT id FROM categories WHERE slug = 'fiction'),
+    '#E91E63', '978-1501110368', 2016, false, 'active', ''
+  ),
+  (
+    'It Starts with Us', 'Colleen Hoover',
+    'The sequel to It Ends with Us — picking up where Lily and Atlas''s story left off, exploring new beginnings after hard endings.',
+    170.00, 3,
+    (SELECT id FROM categories WHERE slug = 'fiction'),
+    '#AB47BC', '978-1668001226', 2022, false, 'active', ''
+  ),
+  (
+    'Ugly Love', 'Colleen Hoover',
+    'A heart-wrenching story about the boundaries between love and pain, told in alternating timelines of past and present.',
+    170.00, 2,
+    (SELECT id FROM categories WHERE slug = 'fiction'),
+    '#5C6BC0', '978-1476753188', 2014, false, 'active', ''
+  ),
+  (
+    'Verity', 'Colleen Hoover',
+    'A thrilling, dark romance-thriller about a writer who uncovers a chilling autobiography hidden in a bestselling author''s home.',
+    170.00, 2,
+    (SELECT id FROM categories WHERE slug = 'fiction'),
+    '#C62828', '978-1538724736', 2018, false, 'active', ''
+  ),
+  (
+    'Rich Dad Poor Dad', 'Robert T. Kiyosaki',
+    'What the rich teach their kids about money that the poor and middle class do not — the #1 personal finance book of all time.',
+    170.00, 3,
+    (SELECT id FROM categories WHERE slug = 'business-finance'),
+    '#6A1B9A', '978-1612681139', 1997, false, 'active', ''
+  ),
+  (
+    'Cashflow Quadrant', 'Robert T. Kiyosaki',
+    'Rich Dad''s guide to financial freedom — understanding the four types of people who make up the world of business.',
+    170.00, 2,
+    (SELECT id FROM categories WHERE slug = 'business-finance'),
+    '#00838F', '978-1612680057', 1998, false, 'active', ''
   );
 
 -- Unverified titles

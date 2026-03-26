@@ -40,7 +40,7 @@ export default function CartPage() {
             return (
             <div key={item.bookId} className="card flex gap-4 p-4 sm:p-5">
               <div className="w-16 sm:w-20 shrink-0">
-                <BookCover title={item.title} author={item.author} color={item.coverColor} isbn={item.isbn} />
+                <BookCover title={item.title} author={item.author} color={item.coverColor} isbn={item.isbn} size="sm" />
               </div>
               <div className="flex-1 min-w-0">
                 <Link to={`/book/${item.bookId}`} className="font-serif text-base text-brand-dark hover:text-brand-gold transition-colors line-clamp-1">

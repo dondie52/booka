@@ -49,7 +49,7 @@ export default function BookDetailPage() {
         {/* Cover */}
         <div className="flex justify-center">
           <div className="w-full max-w-xs sm:max-w-sm">
-            <BookCover title={book.title} author={book.author} color={book.coverColor} isbn={book.isbn} coverImage={book.coverImage} />
+            <BookCover title={book.title} author={book.author} color={book.coverColor} isbn={book.isbn} coverImage={book.coverImage} size="lg" priority />
           </div>
         </div>
 

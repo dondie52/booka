@@ -18,6 +18,7 @@ export default function BookCard({ book }) {
           color={book.coverColor}
           isbn={book.isbn}
           coverImage={book.coverImage}
+          size="md"
           className="group-hover:scale-[1.02] transition-transform duration-300"
         />
       </div>

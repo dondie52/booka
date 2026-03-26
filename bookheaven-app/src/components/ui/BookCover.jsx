@@ -1,15 +1,19 @@
 import { useState } from 'react'
 
-function getOpenLibraryCover(isbn) {
+const OL_SUFFIX = { sm: 'S', md: 'M', lg: 'L' }
+
+function getOpenLibraryCover(isbn, size = 'md') {
   if (!isbn) return null
   const clean = isbn.replace(/-/g, '')
-  return `https://covers.openlibrary.org/b/isbn/${clean}-L.jpg`
+  const suffix = OL_SUFFIX[size] || 'M'
+  return `https://covers.openlibrary.org/b/isbn/${clean}-${suffix}.jpg`
 }
 
-export default function BookCover({ title, author, color = '#2C2C2C', isbn, coverImage, className = '' }) {
+export default function BookCover({ title, author, color = '#2C2C2C', isbn, coverImage, className = '', size = 'md', priority = false }) {
   const [imgFailed, setImgFailed] = useState(false)
+  const [loading, setLoading] = useState(true)
   // Priority: custom coverImage → OpenLibrary via ISBN → color fallback
-  const coverUrl = coverImage || getOpenLibraryCover(isbn)
+  const coverUrl = coverImage || getOpenLibraryCover(isbn, size)
   const showImage = coverUrl && !imgFailed
 
   return (
@@ -19,15 +23,21 @@ export default function BookCover({ title, author, color = '#2C2C2C', isbn, cove
     >
       {showImage ? (
         <>
+          {/* Skeleton pulse while loading */}
+          {loading && (
+            <div className="absolute inset-0 animate-pulse bg-brand-border/30 rounded-sm" />
+          )}
           <img
             src={coverUrl}
             alt={`${title} by ${author}`}
             className="absolute inset-0 w-full h-full object-cover"
-            onError={() => setImgFailed(true)}
+            onError={() => { setImgFailed(true); setLoading(false) }}
             onLoad={e => {
               if (e.target.naturalWidth < 10) setImgFailed(true)
+              setLoading(false)
             }}
-            loading="lazy"
+            loading={priority ? undefined : 'lazy'}
+            fetchPriority={priority ? 'high' : undefined}
           />
           {/* Spine effect */}
           <div className="absolute left-0 top-0 bottom-0 w-2.5 bg-gradient-to-r from-black/30 to-transparent" />

@@ -65,7 +65,7 @@ export default function HomePage() {
                   className="block hover:scale-[1.03] transition-transform duration-300"
                   style={{ marginTop: i % 2 === 0 ? '0' : '28px' }}
                 >
-                  <BookCover title={book.title} author={book.author} color={book.coverColor} isbn={book.isbn} coverImage={book.coverImage} />
+                  <BookCover title={book.title} author={book.author} color={book.coverColor} isbn={book.isbn} coverImage={book.coverImage} size="lg" priority />
                 </Link>
               ))}
             </div>

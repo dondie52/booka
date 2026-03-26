@@ -124,7 +124,7 @@ export default function ManageBooksPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-12 shrink-0 rounded-sm overflow-hidden">
-                        <BookCover title="" author="" color={book.coverColor} isbn={book.isbn} coverImage={book.coverImage} />
+                        <BookCover title="" author="" color={book.coverColor} isbn={book.isbn} coverImage={book.coverImage} size="sm" />
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5">

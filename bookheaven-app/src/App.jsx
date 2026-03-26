@@ -8,6 +8,7 @@ import BookDetailPage from './pages/customer/BookDetailPage'
 import CartPage from './pages/customer/CartPage'
 import CheckoutPage from './pages/customer/CheckoutPage'
 import OrderConfirmationPage from './pages/customer/OrderConfirmationPage'
+import PaymentReturnPage from './pages/customer/PaymentReturnPage'
 import ContactPage from './pages/customer/ContactPage'
 import LoginPage from './pages/customer/LoginPage'
 import SignupPage from './pages/customer/SignupPage'
@@ -31,6 +32,7 @@ export default function App() {
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/order-confirmation/:orderId" element={<OrderConfirmationPage />} />
+        <Route path="/payment-return" element={<PaymentReturnPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />

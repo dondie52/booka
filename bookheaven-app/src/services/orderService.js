@@ -29,6 +29,7 @@ function create({ customer, items, subtotal, deliveryMethod, address, paymentMet
     address: deliveryMethod === 'delivery' ? address : null,
     paymentMethod,
     paymentStatus: paymentResult?.status || 'pending',
+    paymentReference: paymentResult?.paymentReference || null,
     transactionId: paymentResult?.transactionId || null,
     orderStatus: ORDER_STATUS.PENDING,
     createdAt: new Date().toISOString(),
@@ -59,6 +60,17 @@ function updatePaymentStatus(id, paymentStatus) {
   return orders[idx]
 }
 
+function confirmPayment(id) {
+  const orders = getAll()
+  const idx = orders.findIndex(o => o.id === id)
+  if (idx === -1) return null
+  orders[idx].paymentStatus = 'completed'
+  orders[idx].paymentConfirmedAt = new Date().toISOString()
+  orders[idx].updatedAt = new Date().toISOString()
+  storageService.set(storageService.KEYS.ORDERS, orders)
+  return orders[idx]
+}
+
 function getStats() {
   const orders = getAll()
   return {
@@ -71,5 +83,5 @@ function getStats() {
   }
 }
 
-const orderService = { ORDER_STATUS, getAll, getById, create, updateStatus, updatePaymentStatus, getStats }
+const orderService = { ORDER_STATUS, getAll, getById, create, updateStatus, updatePaymentStatus, confirmPayment, getStats }
 export default orderService

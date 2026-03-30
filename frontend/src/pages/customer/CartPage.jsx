@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom'
 import { useCart } from '../../contexts/CartContext'
 import { useData } from '../../contexts/DataContext'
+import { useAuth } from '../../contexts/AuthContext'
 import BookCover from '../../components/ui/BookCover'
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, subtotal, itemCount } = useCart()
   const { getBookById } = useData()
+  const { isCustomer } = useAuth()
 
   if (items.length === 0) {
     return (
@@ -102,7 +104,11 @@ export default function CartPage() {
               <span>Total</span>
               <span>P{subtotal.toFixed(2)}</span>
             </div>
-            <Link to="/checkout" className="btn-primary w-full mt-6">
+            <Link
+              to={isCustomer ? '/checkout' : '/login'}
+              state={isCustomer ? undefined : { from: '/checkout' }}
+              className="btn-primary w-full mt-6"
+            >
               Proceed to Checkout
             </Link>
             <Link to="/shop" className="block text-center text-xs text-brand-text-light hover:text-brand-gold mt-4 transition-colors font-medium">

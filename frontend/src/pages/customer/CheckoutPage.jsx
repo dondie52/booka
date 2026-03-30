@@ -43,6 +43,12 @@ export default function CheckoutPage() {
   }, [isCustomer, user])
 
   useEffect(() => {
+    if (!isCustomer) {
+      navigate('/login', { replace: true, state: { from: '/checkout' } })
+    }
+  }, [isCustomer, navigate])
+
+  useEffect(() => {
     if (items.length === 0) navigate('/cart', { replace: true })
   }, [items.length, navigate])
 
@@ -168,7 +174,7 @@ export default function CheckoutPage() {
     }
   }
 
-  if (items.length === 0) return null
+  if (!isCustomer || items.length === 0) return null
 
   return (
     <div className="container-page py-8 sm:py-12">

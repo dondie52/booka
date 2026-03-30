@@ -1,16 +1,19 @@
 import { useState } from 'react'
-import { Link, useNavigate, Navigate } from 'react-router-dom'
+import { Link, useNavigate, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 
 export default function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { user, loginCustomer, loginAdmin } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  if (user?.role === 'customer') return <Navigate to="/account" replace />
+  const redirectTo = location.state?.from === '/checkout' ? '/checkout' : '/account'
+
+  if (user?.role === 'customer') return <Navigate to={redirectTo} replace />
   if (user?.role === 'admin') return <Navigate to="/admin" replace />
 
   async function handleSubmit(e) {
@@ -30,7 +33,7 @@ export default function LoginPage() {
     const customerResult = loginCustomer(email, password)
     if (customerResult.success) {
       setLoading(false)
-      navigate('/account')
+      navigate(redirectTo, { replace: true })
       return
     }
 

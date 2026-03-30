@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useData } from '../../contexts/DataContext'
 import Modal from '../../components/ui/Modal'
 import BookCover from '../../components/ui/BookCover'
@@ -14,6 +14,8 @@ export default function ManageBooksPage() {
   const [form, setForm] = useState(emptyBook)
   const [search, setSearch] = useState('')
   const [filterVerification, setFilterVerification] = useState(false)
+  const [imageError, setImageError] = useState('')
+  const fileInputRef = useRef(null)
 
   const filtered = books.filter(b => {
     const matchesSearch = b.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -27,6 +29,7 @@ export default function ManageBooksPage() {
   function openAdd() {
     setEditing(null)
     setForm(emptyBook)
+    setImageError('')
     setModalOpen(true)
   }
 
@@ -47,7 +50,33 @@ export default function ManageBooksPage() {
       needsVerification: book.needsVerification || false,
       verificationNotes: book.verificationNotes || '',
     })
+    setImageError('')
     setModalOpen(true)
+  }
+
+  function handlePhotoSelect(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      setImageError('Please select a valid image file.')
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setImageError('Image is too large. Please use an image under 5MB.')
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      setForm(prev => ({ ...prev, coverImage: String(reader.result || '') }))
+      setImageError('')
+    }
+    reader.onerror = () => {
+      setImageError('Could not read the selected image. Please try again.')
+    }
+    reader.readAsDataURL(file)
   }
 
   function handleSave(e) {
@@ -215,6 +244,37 @@ export default function ManageBooksPage() {
           <div>
             <label className="block text-xs font-medium text-brand-text-light mb-1 font-sans">Cover Image URL</label>
             <input type="text" value={form.coverImage} onChange={e => setForm(f => ({ ...f, coverImage: e.target.value }))} className="input-field" placeholder="Optional — overrides ISBN cover" />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-brand-text-light mb-1 font-sans">Take/Upload Cover Photo</label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handlePhotoSelect}
+              className="input-field py-2"
+            />
+            <p className="text-[11px] text-brand-text-light mt-1">
+              On mobile, this can open your camera. Selected image is saved as the cover image.
+            </p>
+            {imageError && <p className="text-xs text-brand-error mt-1">{imageError}</p>}
+            {form.coverImage && (
+              <div className="mt-2 flex items-center gap-3">
+                <img src={form.coverImage} alt="Selected cover preview" className="w-12 h-16 object-cover rounded border border-brand-border/50" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setForm(prev => ({ ...prev, coverImage: '' }))
+                    setImageError('')
+                    if (fileInputRef.current) fileInputRef.current.value = ''
+                  }}
+                  className="text-xs text-brand-error hover:opacity-70 font-medium"
+                >
+                  Remove Photo
+                </button>
+              </div>
+            )}
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>

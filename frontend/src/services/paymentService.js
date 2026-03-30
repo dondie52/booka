@@ -3,7 +3,6 @@
  *
  * Supports:
  * - DPO Pay (cards + mobile money via hosted payment page)
- * - Orange Money (manual confirmation)
  * - Bank Transfer (manual confirmation)
  * - Cash on Delivery
  */
@@ -12,7 +11,6 @@ import dpoService from './dpoService'
 
 const PAYMENT_METHODS = {
   DPO: 'dpo',
-  MOBILE_MONEY: 'mobile_money',
   CASH_ON_DELIVERY: 'cash_on_delivery',
   BANK_TRANSFER: 'bank_transfer',
 }
@@ -48,11 +46,6 @@ const paymentService = {
 
     methods.push(
       {
-        id: PAYMENT_METHODS.MOBILE_MONEY,
-        label: 'Orange Money (Manual)',
-        instructions: `Send payment to Orange Money number: +267 76 984 827\nUse your Order ID as the reference.`,
-      },
-      {
         id: PAYMENT_METHODS.BANK_TRANSFER,
         label: 'Bank Transfer (EFT)',
         instructions: `Transfer to:\nBank: First National Bank Botswana\nAccount: Contact us for details\nReference: Your Order ID`,
@@ -68,7 +61,7 @@ const paymentService = {
   },
 
   /**
-   * Process payment for manual methods (Orange Money, Bank Transfer, COD)
+   * Process payment for manual methods (Bank Transfer, COD)
    * DPO payments are handled separately via dpoService
    */
   async processPayment({ amount, method, customerInfo, paymentReference }) {

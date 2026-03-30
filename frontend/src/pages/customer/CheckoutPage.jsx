@@ -19,7 +19,7 @@ export default function CheckoutPage() {
   const [error, setError] = useState('')
   const [fieldErrors, setFieldErrors] = useState({})
 
-  const defaultPaymentMethod = dpoService.isConfigured() ? 'dpo' : 'mobile_money'
+  const defaultPaymentMethod = dpoService.isConfigured() ? 'dpo' : 'bank_transfer'
 
   const [form, setForm] = useState({
     name: '',
@@ -82,7 +82,7 @@ export default function CheckoutPage() {
     if (form.deliveryMethod === 'delivery' && !form.address.trim()) {
       errors.address = 'Delivery address is required.'
     }
-    const needsRef = form.paymentMethod === 'mobile_money' || form.paymentMethod === 'bank_transfer'
+    const needsRef = form.paymentMethod === 'bank_transfer'
     if (needsRef && !form.paymentReference.trim()) {
       errors.paymentReference = 'Please enter your payment reference or confirmation number.'
     }
@@ -140,7 +140,7 @@ export default function CheckoutPage() {
         return
       }
 
-      // Manual methods (Orange Money, Bank Transfer, COD)
+      // Manual methods (Bank Transfer, COD)
       const paymentResult = await paymentService.processPayment({
         amount: total,
         method: form.paymentMethod,
@@ -316,20 +316,8 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              {/* Payment instructions */}
-              {(() => {
-                const selected = paymentMethods.find(m => m.id === form.paymentMethod)
-                if (!selected?.instructions) return null
-                return (
-                  <div className="mt-4 p-4 bg-brand-cream rounded-xl border border-brand-border/40">
-                    <p className="text-xs font-semibold text-brand-dark uppercase tracking-wider mb-2 font-sans">Payment Instructions</p>
-                    <p className="text-sm text-brand-text whitespace-pre-line leading-relaxed">{selected.instructions}</p>
-                  </div>
-                )
-              })()}
-
               {/* Payment reference input */}
-              {(form.paymentMethod === 'mobile_money' || form.paymentMethod === 'bank_transfer') && (
+              {form.paymentMethod === 'bank_transfer' && (
                 <div className="mt-4">
                   <label className="block text-xs font-medium text-brand-text-light mb-1.5 font-sans">Payment Reference / Confirmation Number *</label>
                   <input
@@ -343,7 +331,7 @@ export default function CheckoutPage() {
 
                   {/* WhatsApp confirm button */}
                   <a
-                    href={paymentService.getWhatsAppLink(`Hi, I've made a payment of P${total.toFixed(2)} for my BookHeaven order via ${form.paymentMethod === 'mobile_money' ? 'Orange Money' : 'Bank Transfer'}. Reference: ${form.paymentReference || '(pending)'}. Please confirm.`)}
+                    href={paymentService.getWhatsAppLink(`Hi, I've made a payment of P${total.toFixed(2)} for my BookHeaven order via Bank Transfer. Reference: ${form.paymentReference || '(pending)'}. Please confirm.`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 mt-3 px-4 py-2.5 bg-[#25D366] hover:bg-[#20BD5A] text-white text-sm font-medium rounded-lg transition-colors"

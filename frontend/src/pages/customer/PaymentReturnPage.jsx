@@ -46,7 +46,7 @@ export default function PaymentReturnPage() {
 
         if (pendingOrder && items.length > 0) {
           // Create the order now that payment is confirmed
-          const order = orderService.create({
+          const order = await orderService.create({
             customer: pendingOrder.customer,
             items: items.map(i => ({ bookId: i.bookId, title: i.title, author: i.author, price: i.price, quantity: i.quantity })),
             subtotal,

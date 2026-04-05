@@ -31,26 +31,26 @@ export default function ManageOrdersPage() {
   const [filterStatus, setFilterStatus] = useState('')
 
   useEffect(() => {
-    setOrders(orderService.getAll())
+    orderService.getAll().then(setOrders)
   }, [])
 
-  function refreshOrders() {
-    setOrders(orderService.getAll())
+  async function refreshOrders() {
+    setOrders(await orderService.getAll())
   }
 
-  function handleStatusChange(orderId, newStatus) {
-    orderService.updateStatus(orderId, newStatus)
-    refreshOrders()
+  async function handleStatusChange(orderId, newStatus) {
+    await orderService.updateStatus(orderId, newStatus)
+    await refreshOrders()
     if (selectedOrder?.id === orderId) {
-      setSelectedOrder(orderService.getById(orderId))
+      setSelectedOrder(await orderService.getById(orderId))
     }
   }
 
-  function handleConfirmPayment(orderId) {
-    orderService.confirmPayment(orderId)
-    refreshOrders()
+  async function handleConfirmPayment(orderId) {
+    await orderService.confirmPayment(orderId)
+    await refreshOrders()
     if (selectedOrder?.id === orderId) {
-      setSelectedOrder(orderService.getById(orderId))
+      setSelectedOrder(await orderService.getById(orderId))
     }
   }
 

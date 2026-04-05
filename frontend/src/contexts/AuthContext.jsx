@@ -1,116 +1,149 @@
-import { createContext, useContext, useState, useCallback } from 'react'
-import storageService from '../services/storageService'
+import { createContext, useContext, useState, useCallback, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
 
 const AuthContext = createContext()
 
-// Admin credentials (MVP — replace with backend auth later)
-const ADMIN_CREDENTIALS = { email: 'admin@bookheaven.co.bw', password: 'bookheaven2024' }
-
-function getUsers() {
-  return storageService.get(storageService.KEYS.USERS, [])
-}
-
-function saveUsers(users) {
-  storageService.set(storageService.KEYS.USERS, users)
-}
-
-function hashPassword(password) {
-  let hash = 0
-  for (let i = 0; i < password.length; i++) {
-    const char = password.charCodeAt(i)
-    hash = ((hash << 5) - hash) + char
-    hash |= 0
-  }
-  return 'h_' + Math.abs(hash).toString(36)
-}
-
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() =>
-    storageService.get(storageService.KEYS.CURRENT_USER, null)
-  )
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  // Load session on mount + listen for auth changes
+  useEffect(() => {
+    // Get current session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        loadProfile(session.user)
+      } else {
+        setLoading(false)
+      }
+    })
+
+    // Listen for login/logout events
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        loadProfile(session.user)
+      } else {
+        setUser(null)
+        setLoading(false)
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  async function loadProfile(authUser) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('full_name, role, phone')
+      .eq('id', authUser.id)
+      .single()
+
+    setUser({
+      id: authUser.id,
+      name: profile?.full_name || authUser.user_metadata?.full_name || '',
+      email: authUser.email,
+      phone: profile?.phone || '',
+      role: profile?.role || 'customer',
+    })
+    setLoading(false)
+  }
 
   const isAuthenticated = user?.role === 'admin'
   const isCustomer = user?.role === 'customer'
 
-  const register = useCallback((name, email, password) => {
-    const users = getUsers()
-    const normalizedEmail = email.trim().toLowerCase()
+  const register = useCallback(async (name, email, password) => {
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim().toLowerCase(),
+      password,
+      options: {
+        data: { full_name: name.trim() },
+      },
+    })
 
-    if (users.find(u => u.email === normalizedEmail)) {
-      return { success: false, error: 'An account with this email already exists.' }
+    if (error) {
+      return { success: false, error: error.message }
     }
 
-    const newUser = {
-      id: 'user_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-      name: name.trim(),
-      email: normalizedEmail,
-      passwordHash: hashPassword(password),
-      role: 'customer',
-      createdAt: new Date().toISOString(),
+    // If email confirmation is disabled, user is logged in immediately
+    if (data.user) {
+      await loadProfile(data.user)
     }
-
-    saveUsers([...users, newUser])
-
-    const sessionUser = { id: newUser.id, name: newUser.name, email: newUser.email, role: 'customer' }
-    setUser(sessionUser)
-    storageService.set(storageService.KEYS.CURRENT_USER, sessionUser)
 
     return { success: true }
   }, [])
 
-  const loginCustomer = useCallback((email, password) => {
-    const users = getUsers()
-    const normalizedEmail = email.trim().toLowerCase()
-    const found = users.find(u => u.email === normalizedEmail && u.passwordHash === hashPassword(password))
+  const loginCustomer = useCallback(async (email, password) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    })
 
-    if (!found) {
+    if (error) {
       return { success: false, error: 'Invalid email or password.' }
     }
 
-    const sessionUser = { id: found.id, name: found.name, email: found.email, role: 'customer' }
-    setUser(sessionUser)
-    storageService.set(storageService.KEYS.CURRENT_USER, sessionUser)
-
+    await loadProfile(data.user)
     return { success: true }
   }, [])
 
-  const loginAdmin = useCallback((email, password) => {
-    if (email.trim().toLowerCase() === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
-      const sessionUser = { id: 'admin', name: 'Admin', email: ADMIN_CREDENTIALS.email, role: 'admin' }
-      setUser(sessionUser)
-      storageService.set(storageService.KEYS.CURRENT_USER, sessionUser)
-      storageService.set(storageService.KEYS.AUTH, true)
-      return { success: true }
+  // Admin uses the same Supabase Auth — role is checked from profiles table
+  const loginAdmin = useCallback(async (email, password) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    })
+
+    if (error) {
+      return { success: false, error: 'Invalid credentials.' }
     }
-    return { success: false, error: 'Invalid admin credentials.' }
+
+    // Check if user has admin role
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', data.user.id)
+      .single()
+
+    if (profile?.role !== 'admin') {
+      await supabase.auth.signOut()
+      return { success: false, error: 'You do not have admin access.' }
+    }
+
+    await loadProfile(data.user)
+    return { success: true }
   }, [])
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    await supabase.auth.signOut()
     setUser(null)
-    storageService.remove(storageService.KEYS.CURRENT_USER)
-    storageService.remove(storageService.KEYS.AUTH)
   }, [])
 
-  const updateProfile = useCallback((updates) => {
-    if (!user || user.role !== 'customer') return { success: false, error: 'Not logged in.' }
+  const updateProfile = useCallback(async (updates) => {
+    if (!user) return { success: false, error: 'Not logged in.' }
 
-    const users = getUsers()
-    const idx = users.findIndex(u => u.id === user.id)
-    if (idx === -1) return { success: false, error: 'User not found.' }
+    const profileUpdates = {}
+    if (updates.name) profileUpdates.full_name = updates.name.trim()
+    if (updates.email) profileUpdates.email = updates.email.trim().toLowerCase()
 
-    if (updates.name) users[idx].name = updates.name.trim()
-    if (updates.email) {
-      const normalizedEmail = updates.email.trim().toLowerCase()
-      const emailTaken = users.find(u => u.email === normalizedEmail && u.id !== user.id)
-      if (emailTaken) return { success: false, error: 'Email already in use.' }
-      users[idx].email = normalizedEmail
+    const { error } = await supabase
+      .from('profiles')
+      .update(profileUpdates)
+      .eq('id', user.id)
+
+    if (error) {
+      return { success: false, error: error.message }
     }
 
-    saveUsers(users)
+    // If email changed, also update in auth
+    if (updates.email) {
+      await supabase.auth.updateUser({ email: updates.email.trim().toLowerCase() })
+    }
 
-    const sessionUser = { ...user, name: users[idx].name, email: users[idx].email }
-    setUser(sessionUser)
-    storageService.set(storageService.KEYS.CURRENT_USER, sessionUser)
+    setUser(prev => ({
+      ...prev,
+      name: updates.name?.trim() || prev.name,
+      email: updates.email?.trim().toLowerCase() || prev.email,
+    }))
 
     return { success: true }
   }, [user])
@@ -118,6 +151,7 @@ export function AuthProvider({ children }) {
   return (
     <AuthContext.Provider value={{
       user,
+      loading,
       isAuthenticated,
       isCustomer,
       register,

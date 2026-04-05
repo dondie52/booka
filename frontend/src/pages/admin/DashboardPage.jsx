@@ -1,11 +1,24 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useData } from '../../contexts/DataContext'
 import orderService from '../../services/orderService'
 
 export default function DashboardPage() {
   const { books } = useData()
-  const stats = orderService.getStats()
-  const recentOrders = orderService.getAll().slice(0, 5)
+  const [stats, setStats] = useState({ totalOrders: 0, pendingOrders: 0, completedOrders: 0, totalRevenue: 0 })
+  const [recentOrders, setRecentOrders] = useState([])
+
+  useEffect(() => {
+    async function load() {
+      const [s, orders] = await Promise.all([
+        orderService.getStats(),
+        orderService.getAll(),
+      ])
+      setStats(s)
+      setRecentOrders(orders.slice(0, 5))
+    }
+    load()
+  }, [])
 
   const cards = [
     { label: 'Total Books', value: books.length, color: 'bg-blue-50 text-blue-700', link: '/admin/books' },

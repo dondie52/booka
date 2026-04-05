@@ -26,24 +26,27 @@ export default function LoginPage() {
     }
 
     setLoading(true)
-    // Simulate network delay for realistic UX
-    await new Promise(r => setTimeout(r, 400))
 
-    // Try customer login first, then admin
-    const customerResult = loginCustomer(email, password)
-    if (customerResult.success) {
+    try {
+      // Try customer login first, then admin
+      const customerResult = await loginCustomer(email, password)
+      if (customerResult.success) {
+        setLoading(false)
+        navigate(redirectTo, { replace: true })
+        return
+      }
+
+      const adminResult = await loginAdmin(email, password)
       setLoading(false)
-      navigate(redirectTo, { replace: true })
-      return
-    }
 
-    const adminResult = loginAdmin(email, password)
-    setLoading(false)
-
-    if (adminResult.success) {
-      navigate('/admin')
-    } else {
-      setError('Invalid email or password.')
+      if (adminResult.success) {
+        navigate('/admin')
+      } else {
+        setError('Invalid email or password.')
+      }
+    } catch {
+      setLoading(false)
+      setError('Something went wrong. Please try again.')
     }
   }
 

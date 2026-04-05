@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import orderService from '../../services/orderService'
@@ -10,12 +10,20 @@ export default function AccountPage() {
   const [email, setEmail] = useState(user?.email || '')
   const [profileMsg, setProfileMsg] = useState('')
   const [profileError, setProfileError] = useState('')
+  const [orders, setOrders] = useState([])
+
+  useEffect(() => {
+    if (isCustomer && user?.email) {
+      orderService.getAll().then(allOrders => {
+        const userOrders = allOrders
+          .filter(o => o.customer?.email?.toLowerCase() === user.email.toLowerCase())
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        setOrders(userOrders)
+      })
+    }
+  }, [isCustomer, user?.email])
 
   if (!isCustomer) return <Navigate to="/login" replace />
-
-  const orders = orderService.getAll().filter(o =>
-    o.customer?.email?.toLowerCase() === user.email.toLowerCase()
-  ).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 
   function handleSaveProfile(e) {
     e.preventDefault()

@@ -49,15 +49,19 @@ export default function SignupPage() {
     if (!validate()) return
 
     setLoading(true)
-    await new Promise(r => setTimeout(r, 500))
 
-    const result = register(form.name, form.email, form.password)
-    setLoading(false)
+    try {
+      const result = await register(form.name, form.email, form.password)
+      setLoading(false)
 
-    if (result.success) {
-      navigate('/account')
-    } else {
-      setError(result.error)
+      if (result.success) {
+        navigate('/account')
+      } else {
+        setError(result.error)
+      }
+    } catch {
+      setLoading(false)
+      setError('Something went wrong. Please try again.')
     }
   }
 

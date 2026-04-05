@@ -23,15 +23,19 @@ export default function AdminLoginPage() {
     }
 
     setLoading(true)
-    await new Promise(r => setTimeout(r, 400))
 
-    const result = loginAdmin(email, password)
-    setLoading(false)
+    try {
+      const result = await loginAdmin(email, password)
+      setLoading(false)
 
-    if (result.success) {
-      navigate('/admin')
-    } else {
-      setError(result.error)
+      if (result.success) {
+        navigate('/admin')
+      } else {
+        setError(result.error)
+      }
+    } catch {
+      setLoading(false)
+      setError('Something went wrong. Please try again.')
     }
   }
 

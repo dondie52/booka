@@ -1,10 +1,27 @@
+import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import orderService from '../../services/orderService'
 import paymentService from '../../services/paymentService'
 
 export default function OrderConfirmationPage() {
   const { orderId } = useParams()
-  const order = orderService.getById(orderId)
+  const [order, setOrder] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    orderService.getById(orderId).then(o => {
+      setOrder(o)
+      setLoading(false)
+    })
+  }, [orderId])
+
+  if (loading) {
+    return (
+      <div className="container-page py-20 text-center">
+        <p className="text-brand-text-light text-sm">Loading order...</p>
+      </div>
+    )
+  }
 
   if (!order) {
     return (

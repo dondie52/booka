@@ -148,7 +148,7 @@ export default function CheckoutPage() {
         paymentReference: form.paymentReference.trim() || null,
       })
 
-      const order = orderService.create({
+      const order = await orderService.create({
         customer: { name: form.name, email: form.email, phone: form.phone },
         items: items.map(i => ({ bookId: i.bookId, title: i.title, author: i.author, price: i.price, quantity: i.quantity })),
         subtotal,

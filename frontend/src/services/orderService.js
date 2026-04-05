@@ -67,11 +67,14 @@ async function getAll() {
 }
 
 async function getById(id) {
-  // id could be order_number or UUID
+  // id could be order_number (BH-...) or UUID
+  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
+  const column = isUUID ? 'id' : 'order_number'
+
   const { data: order, error } = await supabase
     .from('orders')
     .select('*')
-    .or(`order_number.eq.${id},id.eq.${id}`)
+    .eq(column, id)
     .single()
 
   if (error || !order) return null

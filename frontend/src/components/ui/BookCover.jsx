@@ -9,12 +9,35 @@ function getOpenLibraryCover(isbn, size = 'md') {
   return `https://covers.openlibrary.org/b/isbn/${clean}-${suffix}.jpg`
 }
 
+// Google Books ID lookup for books missing from OpenLibrary
+const GOOGLE_BOOKS_IDS = {
+  '9781529146516': 'YmHXzwEACAAJ',  // The Diary of a CEO
+  '9781443461771': 'VK0N0AEACAAJ',  // The Wealth Money Can't Buy
+  '9781529345414': 'DYVhzQEACAAJ',  // Happy Sexy Millionaire
+  '9781988171968': 'HhOgzwEACAAJ',  // The Pivot Year
+}
+
+function getGoogleBooksCover(isbn) {
+  if (!isbn) return null
+  const clean = isbn.replace(/-/g, '')
+  const id = GOOGLE_BOOKS_IDS[clean]
+  if (!id) return null
+  return `https://books.google.com/books/content?id=${id}&printsec=frontcover&img=1&zoom=1`
+}
+
 export default function BookCover({ title, author, color = '#2C2C2C', isbn, coverImage, className = '', size = 'md', priority = false }) {
-  const [imgFailed, setImgFailed] = useState(false)
+  const [sourceIndex, setSourceIndex] = useState(0)
   const [loading, setLoading] = useState(true)
-  // Priority: custom coverImage → OpenLibrary via ISBN → color fallback
-  const coverUrl = coverImage || getOpenLibraryCover(isbn, size)
-  const showImage = coverUrl && !imgFailed
+
+  // Priority: custom coverImage → OpenLibrary → Google Books → color fallback
+  const sources = [
+    coverImage,
+    getOpenLibraryCover(isbn, size),
+    getGoogleBooksCover(isbn),
+  ].filter(Boolean)
+
+  const coverUrl = sources[sourceIndex]
+  const showImage = coverUrl && sourceIndex < sources.length
 
   return (
     <div
@@ -31,9 +54,9 @@ export default function BookCover({ title, author, color = '#2C2C2C', isbn, cove
             src={coverUrl}
             alt={`${title} by ${author}`}
             className="absolute inset-0 w-full h-full object-cover"
-            onError={() => { setImgFailed(true); setLoading(false) }}
+            onError={() => { setSourceIndex(i => i + 1); setLoading(true) }}
             onLoad={e => {
-              if (e.target.naturalWidth < 10) setImgFailed(true)
+              if (e.target.naturalWidth < 10) { setSourceIndex(i => i + 1); setLoading(true); return }
               setLoading(false)
             }}
             loading={priority ? undefined : 'lazy'}

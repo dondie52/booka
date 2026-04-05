@@ -1,73 +1,96 @@
-# Agent Instructions
+# BookHeaven — Project Context
 
-You're working inside the **WAT framework** (Workflows, Agents, Tools). This architecture separates concerns so that probabilistic AI handles reasoning while deterministic code handles execution. That separation is what makes this system reliable.
+## What Is This
 
-## The WAT Architecture
+**BookHeaven** is an online bookstore for Botswana, live at **https://bookhavenbw.shop**. It sells physical books with delivery across Botswana or in-store pickup in Gaborone. The business WhatsApp is +267 76 984 827.
 
-**Layer 1: Workflows (The Instructions)**
-- Markdown SOPs stored in `workflows/`
-- Each workflow defines the objective, required inputs, which tools to use, expected outputs, and how to handle edge cases
-- Written in plain language, the same way you'd brief someone on your team
+## Tech Stack
 
-**Layer 2: Agents (The Decision-Maker)**
-- This is your role. You're responsible for intelligent coordination.
-- Read the relevant workflow, run tools in the correct sequence, handle failures gracefully, and ask clarifying questions when needed
-- You connect intent to execution without trying to do everything yourself
-- Example: If you need to pull data from a website, don't attempt it directly. Read `workflows/scrape_website.md`, figure out the required inputs, then execute `tools/scrape_single_site.py`
+- **Frontend**: React 18 + Tailwind CSS + Vite, deployed on GitHub Pages
+- **Routing**: React Router DOM 6 with HashRouter (for GitHub Pages SPA compatibility)
+- **Data Storage**: Currently localStorage (Supabase schema is ready but not yet wired up)
+- **Payments**: DPO Pay (Botswana payment gateway) via Supabase Edge Functions, plus manual methods (Orange Money, bank transfer, cash on delivery)
+- **Backend**: Supabase (auth, PostgreSQL, Edge Functions). No custom Node.js backend yet — `backend/` is empty
+- **Repo**: https://github.com/dondie52/booka
 
-**Layer 3: Tools (The Execution)**
-- Python scripts in `tools/` that do the actual work
-- API calls, data transformations, file operations, database queries
-- Credentials and API keys are stored in `.env`
-- These scripts are consistent, testable, and fast
+## Project Structure
 
-**Why this matters:** When AI tries to handle every step directly, accuracy drops fast. If each step is 90% accurate, you're down to 59% success after just five steps. By offloading execution to deterministic scripts, you stay focused on orchestration and decision-making where you excel.
-
-## How to Operate
-
-**1. Look for existing tools first**
-Before building anything new, check `tools/` based on what your workflow requires. Only create new scripts when nothing exists for that task.
-
-**2. Learn and adapt when things fail**
-When you hit an error:
-- Read the full error message and trace
-- Fix the script and retest (if it uses paid API calls or credits, check with me before running again)
-- Document what you learned in the workflow (rate limits, timing quirks, unexpected behavior)
-- Example: You get rate-limited on an API, so you dig into the docs, discover a batch endpoint, refactor the tool to use it, verify it works, then update the workflow so this never happens again
-
-**3. Keep workflows current**
-Workflows should evolve as you learn. When you find better methods, discover constraints, or encounter recurring issues, update the workflow. That said, don't create or overwrite workflows without asking unless I explicitly tell you to. These are your instructions and need to be preserved and refined, not tossed after one use.
-
-## The Self-Improvement Loop
-
-Every failure is a chance to make the system stronger:
-1. Identify what broke
-2. Fix the tool
-3. Verify the fix works
-4. Update the workflow with the new approach
-5. Move on with a more robust system
-
-This loop is how the framework improves over time.
-
-## File Structure
-
-**What goes where:**
-- **Deliverables**: Final outputs go to cloud services (Google Sheets, Slides, etc.) where I can access them directly
-- **Intermediates**: Temporary processing files that can be regenerated
-
-**Directory layout:**
 ```
-.tmp/           # Temporary files (scraped data, intermediate exports). Regenerated as needed.
-tools/          # Python scripts for deterministic execution
-workflows/      # Markdown SOPs defining what to do and how
-.env            # API keys and environment variables (NEVER store secrets anywhere else)
-credentials.json, token.json  # Google OAuth (gitignored)
+frontend/                  # React SPA (the main app)
+  src/
+    components/            # Reusable UI: BookCard, BookGrid, Header, Footer, Modal, etc.
+    contexts/              # React Context providers
+      AuthContext.jsx      # User auth state (login/signup/logout, localStorage-based)
+      CartContext.jsx      # Shopping cart state (persisted in localStorage)
+      DataContext.jsx      # Books, categories, orders CRUD (localStorage-based)
+    pages/
+      customer/            # Customer-facing: Home, Shop, BookDetail, Cart, Checkout, Account, etc.
+      admin/               # Admin panel: Dashboard, ManageBooks, ManageOrders, ManageCategories
+    services/
+      dpoService.js        # DPO Pay integration (calls Supabase Edge Functions)
+      orderService.js      # Order creation and management
+      paymentService.js    # Payment processing coordination
+      storageService.js    # localStorage wrapper with namespaced keys
+    data/
+      books.js             # 150+ book catalog (seed data)
+      categories.js        # Book categories
+  supabase/
+    migrations/            # 9 SQL migrations (enums, profiles, books, orders, payments, RLS)
+    functions/             # Edge Functions: create-dpo-token, verify-dpo-payment
+  public/                  # Static assets: favicon, CNAME, robots.txt, sitemap.xml
+backend/                   # Empty — reserved for future Node.js/Express backend
+brand asserts/             # Logo and brand guidelines PNG files
+.github/workflows/         # GitHub Actions: deploy to GitHub Pages on push to main
 ```
 
-**Core principle:** Local files are just for processing. Anything I need to see or use lives in cloud services. Everything in `.tmp/` is disposable.
+## Key Features
 
-## Bottom Line
+**Customer Side:**
+- Browse books by category, search, filter by price/stock
+- Book detail pages with ISBN-based cover images (OpenLibrary fallback)
+- Shopping cart (localStorage-persisted)
+- Multi-step checkout: customer info → delivery method (delivery P35 / free pickup) → payment
+- 4 payment methods: DPO Pay (card/mobile money), Orange Money, bank transfer, cash on delivery
+- User accounts (signup/login/profile editing)
 
-You sit between what I want (workflows) and what actually gets done (tools). Your job is to read instructions, make smart decisions, call the right tools, recover from errors, and keep improving the system as you go.
+**Admin Side (admin@bookheaven.co.bw):**
+- Dashboard with stats (book count, orders, revenue)
+- Full CRUD for books, categories, and orders
+- Order status and payment tracking
 
-Stay pragmatic. Stay reliable. Keep learning.
+## Payment Flow (DPO Pay)
+
+1. Customer selects card/mobile money at checkout
+2. Frontend calls `dpoService.createPayment()` → Supabase Edge Function
+3. Edge Function calls DPO API (XML) with amount in BWP, gets transaction token
+4. Customer redirected to DPO's hosted payment page
+5. After payment, DPO redirects back to `#/payment-return`
+6. `PaymentReturnPage` verifies transaction via another Edge Function
+7. On success: order created, stock deducted, cart cleared
+
+## Data Layer
+
+Currently **all data lives in localStorage** with `bookheaven_` prefix keys:
+- `bookheaven_books`, `bookheaven_categories`, `bookheaven_orders`, `bookheaven_users`
+- `bookheaven_cart`, `bookheaven_current_user`, `bookheaven_auth`
+
+Supabase PostgreSQL schema is fully defined in `frontend/supabase/migrations/` with RLS policies, but the app hasn't been migrated to use it yet. This is a planned next step.
+
+## Currency & Locale
+
+All prices are in **BWP (Botswana Pula)**. Delivery fee is P35 for home delivery, free for in-store pickup.
+
+## Deployment
+
+- GitHub Pages via GitHub Actions (`.github/workflows/deploy.yml`)
+- Custom domain: bookhavenbw.shop (GoDaddy DNS → GitHub Pages)
+- HTTPS enforced, SSL via GitHub/Let's Encrypt
+- Google Search Console verified with sitemap submitted
+
+## What Needs Work
+
+- Migrate from localStorage to Supabase (schema is ready)
+- Build out the `backend/` (API layer, server-side logic)
+- Order history page for customers
+- Email notifications for orders
+- Image uploads for book covers (currently using OpenLibrary ISBN lookup + color fallbacks)

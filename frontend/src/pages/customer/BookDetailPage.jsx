@@ -4,7 +4,7 @@ import { useData } from '../../contexts/DataContext'
 import { useCart } from '../../contexts/CartContext'
 import BookCover from '../../components/ui/BookCover'
 import SEOHead from '../../components/seo/SEOHead'
-import { buildProductSchema } from '../../components/seo/jsonld'
+import { buildBookSchema, buildBreadcrumbSchema } from '../../components/seo/jsonld'
 import { getBookCoverUrl } from '../../components/seo/coverUrl'
 
 export default function BookDetailPage() {
@@ -43,9 +43,16 @@ export default function BookDetailPage() {
         title={`${book.title} by ${book.author}`}
         description={book.description}
         path={`/book/${book.id}`}
-        type="product"
+        type="book"
         image={coverImageUrl}
-        jsonLd={buildProductSchema(book, coverImageUrl)}
+        jsonLd={[
+          buildBookSchema(book, coverImageUrl),
+          buildBreadcrumbSchema([
+            { name: 'Home', url: '/' },
+            { name: getCategoryName(book.categoryId), url: `/shop?category=${book.categoryId}` },
+            { name: book.title },
+          ]),
+        ]}
       />
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-xs text-brand-text-light mb-8 font-sans">

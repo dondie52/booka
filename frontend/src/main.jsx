@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { HashRouter } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom'
+import { HelmetProvider } from 'react-helmet-async'
 import { CartProvider } from './contexts/CartContext'
 import { AuthProvider } from './contexts/AuthContext'
 import { DataProvider } from './contexts/DataContext'
@@ -10,16 +11,18 @@ import './index.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <HashRouter>
-      <ErrorBoundary>
-      <DataProvider>
-        <AuthProvider>
-          <CartProvider>
-            <App />
-          </CartProvider>
-        </AuthProvider>
-      </DataProvider>
-      </ErrorBoundary>
-    </HashRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        <ErrorBoundary>
+        <DataProvider>
+          <AuthProvider>
+            <CartProvider>
+              <App />
+            </CartProvider>
+          </AuthProvider>
+        </DataProvider>
+        </ErrorBoundary>
+      </BrowserRouter>
+    </HelmetProvider>
   </StrictMode>,
 )

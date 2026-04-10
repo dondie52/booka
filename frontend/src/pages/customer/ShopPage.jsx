@@ -2,6 +2,8 @@ import { useState, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useData } from '../../contexts/DataContext'
 import BookGrid from '../../components/books/BookGrid'
+import SEOHead from '../../components/seo/SEOHead'
+import { buildCollectionPageSchema } from '../../components/seo/jsonld'
 
 export default function ShopPage() {
   const { books, categories } = useData()
@@ -50,11 +52,28 @@ export default function ShopPage() {
     }
   }
 
+  const categoryName = selectedCategory
+    ? categories.find(c => c.id === selectedCategory)?.name
+    : null
+  const shopPath = selectedCategory ? `/shop?category=${selectedCategory}` : '/shop'
+
   return (
     <div className="container-page py-8 sm:py-12">
+      <SEOHead
+        title={categoryName ? `${categoryName} Books` : 'Browse All Books'}
+        description={`Shop ${categoryName || 'all'} books at BookHeaven. Delivery across Botswana or free pickup in Gaborone.`}
+        path={shopPath}
+        jsonLd={buildCollectionPageSchema(
+          categoryName || 'All Books',
+          `Browse our ${categoryName ? categoryName.toLowerCase() : ''} book collection at BookHeaven.`,
+          shopPath
+        )}
+      />
       {/* Header */}
       <div className="mb-6">
-        <h1 className="font-serif text-3xl sm:text-4xl text-brand-dark">All Books</h1>
+        <h1 className="font-serif text-3xl sm:text-4xl text-brand-dark">
+          {categoryName ? `${categoryName} Books` : 'All Books'}
+        </h1>
         <p className="text-brand-text-light text-sm mt-1.5">
           Showing {filtered.length} of {books.length} {books.length === 1 ? 'book' : 'books'}
         </p>

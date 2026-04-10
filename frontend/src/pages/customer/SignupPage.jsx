@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate, Navigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import SEOHead from '../../components/seo/SEOHead'
 
 export default function SignupPage() {
   const navigate = useNavigate()
@@ -67,6 +68,7 @@ export default function SignupPage() {
 
   return (
     <div className="container-page py-12 sm:py-20">
+      <SEOHead title="Create Account" path="/signup" noindex />
       <div className="max-w-md mx-auto">
         <div className="text-center mb-8">
           <h1 className="font-serif text-3xl text-brand-dark">Create an account</h1>

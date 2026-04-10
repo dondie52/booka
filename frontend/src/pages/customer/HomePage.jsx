@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom'
 import { useData } from '../../contexts/DataContext'
 import BookCard from '../../components/books/BookCard'
 import BookCover from '../../components/ui/BookCover'
+import SEOHead from '../../components/seo/SEOHead'
+import { buildOrganizationSchema } from '../../components/seo/jsonld'
 
 export default function HomePage() {
   const { books, categories } = useData()
@@ -14,6 +16,10 @@ export default function HomePage() {
 
   return (
     <>
+      <SEOHead
+        path="/"
+        jsonLd={buildOrganizationSchema()}
+      />
       {/* Hero */}
       <section className="bg-brand-cream">
         <div className="container-page py-12 sm:py-16 lg:py-20">

@@ -3,6 +3,9 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useData } from '../../contexts/DataContext'
 import { useCart } from '../../contexts/CartContext'
 import BookCover from '../../components/ui/BookCover'
+import SEOHead from '../../components/seo/SEOHead'
+import { buildProductSchema } from '../../components/seo/jsonld'
+import { getBookCoverUrl } from '../../components/seo/coverUrl'
 
 export default function BookDetailPage() {
   const { id } = useParams()
@@ -16,6 +19,7 @@ export default function BookDetailPage() {
   if (!book) {
     return (
       <div className="container-page py-20 text-center">
+        <SEOHead title="Book Not Found" path={`/book/${id}`} noindex />
         <h2 className="font-serif text-2xl text-brand-dark mb-3">Book not found</h2>
         <Link to="/shop" className="text-sm text-brand-gold hover:text-brand-gold-dark">
           &larr; Back to shop
@@ -25,6 +29,7 @@ export default function BookDetailPage() {
   }
 
   const inStock = book.stock > 0
+  const coverImageUrl = getBookCoverUrl(book)
 
   function handleAddToCart() {
     addItem(book, quantity)
@@ -34,6 +39,14 @@ export default function BookDetailPage() {
 
   return (
     <div className="container-page py-8 sm:py-12">
+      <SEOHead
+        title={`${book.title} by ${book.author}`}
+        description={book.description}
+        path={`/book/${book.id}`}
+        type="product"
+        image={coverImageUrl}
+        jsonLd={buildProductSchema(book, coverImageUrl)}
+      />
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-xs text-brand-text-light mb-8 font-sans">
         <Link to="/shop" className="hover:text-brand-gold transition-colors">Shop</Link>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import orderService from '../../services/orderService'
+import SEOHead from '../../components/seo/SEOHead'
 
 export default function AccountPage() {
   const { user, isCustomer, logout, updateProfile } = useAuth()
@@ -58,6 +59,7 @@ export default function AccountPage() {
 
   return (
     <div className="container-page py-8 sm:py-12">
+      <SEOHead title="My Account" path="/account" noindex />
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>

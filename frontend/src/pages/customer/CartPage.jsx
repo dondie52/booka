@@ -3,15 +3,19 @@ import { useCart } from '../../contexts/CartContext'
 import { useData } from '../../contexts/DataContext'
 import { useAuth } from '../../contexts/AuthContext'
 import BookCover from '../../components/ui/BookCover'
+import SEOHead from '../../components/seo/SEOHead'
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, subtotal, itemCount } = useCart()
   const { getBookById } = useData()
   const { isCustomer } = useAuth()
 
+  const seoHead = <SEOHead title="Your Cart" path="/cart" noindex />
+
   if (items.length === 0) {
     return (
       <div className="container-page py-24 text-center">
+        {seoHead}
         <div className="max-w-sm mx-auto">
           <svg className="w-20 h-20 mx-auto text-brand-border/60 mb-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={0.8}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
@@ -26,6 +30,7 @@ export default function CartPage() {
 
   return (
     <div className="container-page py-8 sm:py-12">
+      {seoHead}
       <h1 className="font-serif text-3xl text-brand-dark mb-1">
         Shopping Cart
       </h1>

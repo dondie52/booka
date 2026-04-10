@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import SEOHead from '../../components/seo/SEOHead'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -52,6 +53,7 @@ export default function LoginPage() {
 
   return (
     <div className="container-page py-12 sm:py-20">
+      <SEOHead title="Sign In" path="/login" noindex />
       <div className="max-w-md mx-auto">
         <div className="text-center mb-8">
           <h1 className="font-serif text-3xl text-brand-dark">Welcome back</h1>

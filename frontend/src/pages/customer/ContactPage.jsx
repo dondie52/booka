@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import SEOHead from '../../components/seo/SEOHead'
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
@@ -11,6 +12,11 @@ export default function ContactPage() {
 
   return (
     <div className="container-page py-8 sm:py-12">
+      <SEOHead
+        title="Contact Us"
+        description="Get in touch with BookHeaven Botswana. Questions about orders, stock, or delivery — we're here to help. WhatsApp: +267 76 984 827."
+        path="/contact"
+      />
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <h1 className="font-serif text-3xl sm:text-4xl text-brand-dark">Get in Touch</h1>

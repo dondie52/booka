@@ -4,6 +4,7 @@ import dpoService from '../../services/dpoService'
 import orderService from '../../services/orderService'
 import { useCart } from '../../contexts/CartContext'
 import { useData } from '../../contexts/DataContext'
+import SEOHead from '../../components/seo/SEOHead'
 
 export default function PaymentReturnPage() {
   const navigate = useNavigate()
@@ -91,6 +92,7 @@ export default function PaymentReturnPage() {
 
   return (
     <div className="container-page py-20">
+      <SEOHead title="Payment" path="/payment-return" noindex />
       <div className="max-w-md mx-auto text-center">
         {status === 'verifying' && (
           <>

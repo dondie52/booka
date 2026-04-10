@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import orderService from '../../services/orderService'
 import paymentService from '../../services/paymentService'
+import SEOHead from '../../components/seo/SEOHead'
 
 export default function OrderConfirmationPage() {
   const { orderId } = useParams()
@@ -37,6 +38,7 @@ export default function OrderConfirmationPage() {
 
   return (
     <div className="container-page py-12 sm:py-20">
+      <SEOHead title="Order Confirmed" path={`/order-confirmation/${orderId}`} noindex />
       <div className="max-w-xl mx-auto text-center">
         {/* Status icon */}
         {isAwaiting ? (

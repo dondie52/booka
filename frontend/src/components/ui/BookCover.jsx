@@ -25,9 +25,12 @@ function getGoogleBooksCover(isbn) {
   return `https://books.google.com/books/content?id=${id}&printsec=frontcover&img=1&zoom=1`
 }
 
+const DIMENSIONS = { sm: { w: 128, h: 192 }, md: { w: 200, h: 300 }, lg: { w: 320, h: 480 } }
+
 export default function BookCover({ title, author, color = '#2C2C2C', isbn, coverImage, className = '', size = 'md', priority = false }) {
   const [sourceIndex, setSourceIndex] = useState(0)
   const [loading, setLoading] = useState(true)
+  const dims = DIMENSIONS[size] || DIMENSIONS.md
 
   // Priority: custom coverImage → OpenLibrary → Google Books → color fallback
   const sources = [
@@ -52,7 +55,9 @@ export default function BookCover({ title, author, color = '#2C2C2C', isbn, cove
           )}
           <img
             src={coverUrl}
-            alt={`${title} by ${author}`}
+            alt={`Cover of ${title} by ${author}`}
+            width={dims.w}
+            height={dims.h}
             className="absolute inset-0 w-full h-full object-cover"
             onError={() => { setSourceIndex(i => i + 1); setLoading(true) }}
             onLoad={e => {

@@ -11,16 +11,22 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <title>BookHeaven - Online Bookstore in Botswana</title>
-    <meta name="description" content="BookHeaven is Botswana's online bookstore. Browse and buy books with secure payment via DPO Pay. Fast delivery across Botswana." />
-    <meta name="keywords" content="bookstore, books, Botswana, online books, buy books, BookHeaven" />
-    <link rel="canonical" href="https://bookhavenbw.shop/" />
-    <meta property="og:title" content="BookHeaven - Online Bookstore in Botswana" />
-    <meta property="og:description" content="Browse and buy books online with secure payment. Botswana's favorite bookstore." />
-    <meta property="og:url" content="https://bookhavenbw.shop/" />
-    <meta property="og:type" content="website" />
+    <title>BookHeaven Botswana | Buy Books Online in Gaborone</title>
   </head>
   <body>
+    <!-- GitHub Pages SPA redirect decoder: restores clean URL from 404.html redirect -->
+    <script>
+      (function(l) {
+        if (l.search[1] === '/') {
+          var decoded = l.search.slice(1).split('&').map(function(s) {
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null,
+            l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location))
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

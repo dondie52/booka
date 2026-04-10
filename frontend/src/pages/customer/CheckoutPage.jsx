@@ -6,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import paymentService from '../../services/paymentService'
 import dpoService from '../../services/dpoService'
 import orderService from '../../services/orderService'
+import SEOHead from '../../components/seo/SEOHead'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const PHONE_RE = /^\+?\d[\d\s-]{6,}$/
@@ -178,6 +179,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="container-page py-8 sm:py-12">
+      <SEOHead title="Checkout" path="/checkout" noindex />
       <div className="mb-8">
         <h1 className="font-serif text-3xl text-brand-dark">Checkout</h1>
         <p className="text-sm text-brand-text-light mt-1">Complete your order</p>

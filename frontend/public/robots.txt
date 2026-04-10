@@ -1,4 +1,10 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /cart
+Disallow: /checkout
+Disallow: /account
+Disallow: /payment-return
+Disallow: /order-confirmation
 
 Sitemap: https://bookhavenbw.shop/sitemap.xml
